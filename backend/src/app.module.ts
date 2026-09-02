@@ -4,6 +4,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { DevicesModule } from './devices/devices.module';
+import { SensorDataModule } from './sensor-data/sensor-data.module';
+import { AlertsModule } from './alerts/alerts.module';
 
 @Module({
   imports: [
@@ -19,6 +21,8 @@ import { DevicesModule } from './devices/devices.module';
       synchronize: false,
     }),
     DevicesModule,
+    SensorDataModule,
+    AlertsModule,
   ],
 
   controllers: [AppController],
