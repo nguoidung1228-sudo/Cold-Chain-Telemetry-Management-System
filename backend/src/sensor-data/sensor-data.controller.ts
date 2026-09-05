@@ -4,15 +4,26 @@ import {
   Param,
   ParseIntPipe,
   Query,
+  Post,
+  Body,
 } from '@nestjs/common';
 
 import { SensorDataService } from './sensor-data.service';
+import { CreateSensorDataDto } from './create-sensor-data.dto';
 
 @Controller('sensor-data')
 export class SensorDataController {
   constructor(
     private readonly sensorDataService: SensorDataService,
   ) {}
+
+  // POST /sensor-data
+  @Post()
+  create(@Body() createSensorDataDto: CreateSensorDataDto) {
+    return this.sensorDataService.create(
+      createSensorDataDto,
+    );
+  }
 
   // GET /sensor-data
   @Get()

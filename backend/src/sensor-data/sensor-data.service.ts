@@ -3,13 +3,47 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
 import { SensorData } from './sensor-data.entity';
+import { AlertsService } from '../alerts/alerts.service';
+import { CreateSensorDataDto } from './create-sensor-data.dto';
 
 @Injectable()
 export class SensorDataService {
   constructor(
     @InjectRepository(SensorData)
     private readonly sensorDataRepository: Repository<SensorData>,
+
+    private readonly alertsService: AlertsService,
   ) {}
+
+  // Tạo dữ liệu cảm biến mới
+  async create(createSensorDataDto: CreateSensorDataDto) {
+    const sensorData = this.sensorDataRepository.create({
+      device_id: createSensorDataDto.device_id,
+      shipment_id: createSensorDataDto.shipment_id,
+      temperature: createSensorDataDto.temperature,
+      humidity: createSensorDataDto.humidity,
+      latitude: createSensorDataDto.latitude,
+      longitude: createSensorDataDto.longitude,
+      recorded_at:
+        createSensorDataDto.recorded_at ?? new Date(),
+    });
+
+    const savedSensorData =
+      await this.sensorDataRepository.save(sensorData);
+
+    const alertResult =
+      await this.alertsService.checkTemperature(
+        createSensorDataDto.temperature,
+        createSensorDataDto.device_id,
+        createSensorDataDto.shipment_id,
+        savedSensorData.id,
+      );
+
+    return {
+      sensorData: savedSensorData,
+      alert: alertResult,
+    };
+  }
 
   // Lấy toàn bộ dữ liệu cảm biến
   async findAll() {
